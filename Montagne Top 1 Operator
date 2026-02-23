@@ -1,0 +1,54 @@
+partitions = [
+    "System;/;50000;85",
+    "Data;/home;150000;40",
+    "Cache;/tmp;5000;10",
+    "Backup;/mnt/backup;500000;92",
+    "USB-Drive;/media/usb;16000;0",
+    "Logs;/var/log;10000;95",
+    "Database;/var/lib/mysql;80000;70",
+    "Shared;/mnt/shared;200000;15",
+    "Win-System;/mnt/win;100000;90",
+    "Recovery;/recovery;2000;98"
+]
+
+for p in partitions:
+    label = p.split(";")[0]
+    print(label)
+
+total_size = sum(int(p.split(";")[2]) for p in partitions)
+print("\nKopējais izmērs:", total_size, "MB")
+
+print("Aizpildījuma atskaite:")
+for p in partitions:
+    label, _, _, used = p.split(";")
+    if int(used) >= 90:
+        print(f"UZMANĪBU: {label} disks ir pilns!")
+
+for p in partitions:
+    name, path, size_mb, usage = p.split(";")
+    size_gb = int(size_mb) / 1024 
+    print(f"{name}: {size_gb:.2f} GB")
+
+def calculate_used_space(parts):
+    return [
+        {
+            "Label": p.split(";")[0],
+            "UsedMB": 500 if p.split(";")[0] == "Cache"
+                        else int(int(p.split(";")[2]) * (int(p.split(";")[3]) / 100))
+        }
+        for p in parts
+    ]
+
+for item in calculate_used_space(partitions):
+    print(item)
+
+path = input("Ievadiet ceļu: ").strip()
+found = "Nav atrasts"
+
+for p in partitions:
+    name, p_path, *_ = p.split(";")
+    if p_path == path:
+        found = name
+        break
+
+print(found)
